@@ -1,0 +1,86 @@
+---
+title: "report"
+author: "xiaofan xia"
+date: "12/5/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(knitr)
+library(ggplot2)
+df <- read.csv("movie_metadata.csv")
+
+```
+
+# Overview
+
+## Introduction
+
+This project focuses on digging into the dataset with the information of more than 5000 movies. My main objective of this project is to find out how much the movie’s reputation is influenced by other related variables such as the popularity of the casts, and movie’s budget. 
+
+## Motivation
+
+I am a very big fan of many kinds of movies. During my spare time, I always choose to watch movies to relax. Also, many friends of mine are working on the film industry right now. Therefore, I generate some questions about movies and its rating system, and that is why I choose this dataset and this project.  
+
+## Dataset: IMDB 5000 Movie Dataset from Kaggle.
+
+The IMDB 5000 Movie Dataset contains 28 variables such as movie names, director names, IMDB scores, and movie Facebook likes, etc. This is an open database from Kaggle.
+
+
+## Research Questions
+
+1. Is there any relationship between the popularity of casts and the income of the movie?
+2. Is there any relationship between the popularity of casts and the reputation of the movie?
+3. Is there any difference in the ratio of the budget (cost) to the gross regarding to different movie genres?
+4. What are the patterns of budget and cast in movies with high reputation?
+5. What are the patterns of budget and cast in movies with high income?
+6. What’s the relationship between the number of face in the poster and the movie’s reputation?
+7. Is there any difference in above questions regarding to different language or country of the movies?
+
+## Concerns
+
+1. The dataset contains 28 variables and more than 5000 entries. It takes time to figure out how to clean the data and possibly categorize the data. 
+2. The dataset does not contain the year of the movie and one of the variables is Facebook likes of the movie, so the likes of some old movies might not be very timely. 
+
+# EDA
+
+After
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+# stats of facebook likes
+fblike_mean <- mean(df$movie_facebook_likes) #7525.965
+fblike_max <- max(df$movie_facebook_likes) #349000
+fblike_min <- min(df$movie_facebook_likes) #0
+fblike_median <- median(df$movie_facebook_likes) #166
+
+# stats of number of voted users
+numvote_mean <- mean(df$num_voted_users) # 83668.161
+numvote_max <- max(df$num_voted_users) #1689764
+numvote_min <- min(df$num_voted_users) #5
+numvote_median <- median(df$num_voted_users) #34359
+
+# stats of imbd rating scores
+rate_mean <- mean(df$imdb_score) #6.442
+rate_max <- max(df$imdb_score) #9.5
+rate_min <- min(df$imdb_score) #1.6
+rate_median <- median(df$imdb_score) #6.6
+
+#plots
+ggplot(df)+geom_smooth(aes(imdb_score, gross))+xlab("IMDB rating scores")+ylab("Gross")+xlim(0,10)
+ggplot(df)+geom_smooth(aes(imdb_score, num_voted_users))+xlab("IMDB rating scores")+ylab("Number of voted users")+xlim(0,10)
+ggplot(df)+geom_smooth(aes(imdb_score,movie_facebook_likes))+xlim(0,10)
+ggplot(df)+geom_smooth(aes(budget,gross))
+
+```
+
+# Medthod
+
+# Analysis
+
+# Conclusion and Discussion
+
+# Appendix
