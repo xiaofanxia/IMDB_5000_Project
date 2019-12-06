@@ -21,35 +21,36 @@ unique(df$primarygenre)
 
 ```
 
-# Overview
+# 1. Overview
 
-## Introduction
+## 1.1 Introduction
 
-This project focuses on digging into the dataset with the information of more than 5000 movies. My main objective of this project is to find out how much the movie’s reputation is influenced by other related variables such as the popularity of the casts, and movie’s budget. 
+This project focuses on digging into the dataset with the information of more than 5000 movies including IMDB scores, number of movies' Facebook likes and basic information about movies' casts. My main objective of this project is to find out how much the movie’s reputation is influenced by other related variables such as the popularity of the casts, and movie’s budget. The reputation of the movie would be quantified as IMDB rating scores, and the popularity of the movie would be quantified as number of Facebook likes and number of voted users. In this project, I firsly cleaned the dataset and did a Exploratory Data Analysis before digging into the modeling analysis. The major model I would use to conduct the analysis and prediction in this project is multi-level linear regression model. 
 
-## Motivation
+## 1.2 Motivation
 
-I am a very big fan of many kinds of movies. During my spare time, I always choose to watch movies to relax. Also, many friends of mine are working on the film industry right now. Therefore, I generate some questions about movies and its rating system, and that is why I choose this dataset and this project.  
+The initial idea of choosing the IMDB movie topic comes from my personal interest. I am a very big fan of many kinds of movies. During my spare time, I always choose to watch movies to relax. Also, many friends of mine are working on the film industry right now. Therefore, I generate some questions about movies and its rating system, and that is why I choose this dataset and this project. I hope that I could solve my own questions about movies during this project as well as help my friends to learn their own industries from a different perspective with data analysis. 
 
-## Dataset: IMDB 5000 Movie Dataset from Kaggle.
+## 1.3 Dataset: IMDB 5000 Movie Dataset from Kaggle.
 
 The IMDB 5000 Movie Dataset contains 28 variables such as movie names, director names, IMDB scores, and movie Facebook likes, etc. This is an open database from Kaggle.
+Sources: https://www.kaggle.com/carolzhangdc/imdb-5000-movie-dataset 
 
+## 1.4 Research Questions
 
-## Research Questions
-
-1. Is there any relationship between the popularity of casts and the income of the movie?
-2. Is there any relationship between the popularity of casts and the reputation of the movie?
-3. Is there any difference in the ratio of the budget (cost) to the gross regarding to different movie genres?
+1. Is there any relationship between the popularity of casts (Facebook likes) and the income of the movie (gross)?
+2. Is there any relationship between the popularity of casts (Facebook likes) and the reputation of the movie(IMDB rating scores)?
+3. Is there any difference in the ratio of the budget to the gross regarding to different movie genres?
 4. What are the patterns of budget and cast in movies with high reputation?
 5. What are the patterns of budget and cast in movies with high income?
 6. What’s the relationship between the number of face in the poster and the movie’s reputation?
 7. Is there any difference in above questions regarding to different language or country of the movies?
+8. How can we predict the IMDB rating score using other information of the movie? 
 
 
-# Exploratory Data Analysis
+# 2. Exploratory Data Analysis
 
-## Basic statistics of major variables
+## 2.1 Basic statistics of major variables
 After cleaning the dataset, I firstly explore the basic statistics of major variables I am interested in. In this part, I am assuming the gross and budget are in the same currency with same unit. There are 66 different countries and 48 different languages in this dataset, which shows diverse background of movies. Here's a table of statistics (values of mean, maximum, minimum and median) for varibales including number of Facebook likes, IMDB rating scores and gross.
 
 ```{r message=FALSE, warning=FALSE, echo=FALSE}
@@ -125,7 +126,7 @@ row.names(stat_df) <- c("Mean","Maxium","Minium","Median")
 kable(t(stat_df))
 ```
 
-## Graph presentations
+## 2.2 Graph presentations
 
 The plot below shows the relationship between movie gross and movie IMDB rating scores. Generally speaking, with higher IMDB rating scores, movies tend to have higher gross. Around IMDB score 7.5, the range of gross is relatively small, which indicates that movies with IMDB score 7.5 tend to have similar profit. 
 
@@ -152,20 +153,22 @@ ggplot(na.omit(df))+geom_smooth(aes(gross,budget))
 ggplot(df)+geom_smooth(aes(imdb_score,duration))
 ```
 
-# Medthod
+# 3. Medthod
 
 Multi-level linear regression model. 
 
-# Analysis
+# 4. Analysis
 
 ```{r}
 
 
 ```
 
-# Conclusion and Discussion
+# 5. Conclusion and Discussion
 
-## Limitations
+## 5.1 Results
+
+## 5.2 Limitations
 
 
-# Appendix
+# 6. Appendix
