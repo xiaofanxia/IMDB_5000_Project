@@ -1,10 +1,9 @@
 ---
-title: "report"
-author: "xiaofan xia"
+title: "IMDB Movie Project Report"
+author: "Xiaofan Xia"
 date: "12/5/2019"
 output:
   pdf_document: default
-  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -12,7 +11,13 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(knitr)
 library(ggplot2)
+library(kableExtra)
 df <- read.csv("movie_metadata.csv")
+df$genres <- as.character(df$genres)
+df <-
+  df %>%
+  separate(genres, into = c("primarygenre"),sep ="[\\|\\ ]",extra = "drop")
+unique(df$primarygenre)
 
 ```
 
@@ -41,14 +46,11 @@ The IMDB 5000 Movie Dataset contains 28 variables such as movie names, director 
 6. What’s the relationship between the number of face in the poster and the movie’s reputation?
 7. Is there any difference in above questions regarding to different language or country of the movies?
 
-## Concerns
 
-1. The dataset contains 28 variables and more than 5000 entries. It takes time to figure out how to clean the data and possibly categorize the data. 
-2. The dataset does not contain the year of the movie and one of the variables is Facebook likes of the movie, so the likes of some old movies might not be very timely. 
+# Exploratory Data Analysis
 
-# EDA
-
-After
+## Basic statistics of major variables
+After cleaning the dataset, I firstly explore the basic statistics of major variables I am interested in. In this part, I am assuming the gross and budget are in the same currency with same unit. There are 66 different countries and 48 different languages in this dataset, which shows diverse background of movies. Here's a table of statistics (values of mean, maximum, minimum and median) for varibales including number of Facebook likes, IMDB rating scores and gross.
 
 ```{r message=FALSE, warning=FALSE, echo=FALSE}
 # stats of facebook likes
@@ -56,6 +58,12 @@ fblike_mean <- mean(df$movie_facebook_likes) #7525.965
 fblike_max <- max(df$movie_facebook_likes) #349000
 fblike_min <- min(df$movie_facebook_likes) #0
 fblike_median <- median(df$movie_facebook_likes) #166
+
+# stats of cast total facebook likes
+cfblike_mean <- mean(df$cast_total_facebook_likes) #9699.064
+cfblike_max <- max(df$cast_total_facebook_likes) #656730
+cfblike_min <- min(df$cast_total_facebook_likes) #3090
+cfblike_median <- median(df$cast_total_facebook_likes) #0
 
 # stats of number of voted users
 numvote_mean <- mean(df$num_voted_users) # 83668.161
@@ -69,18 +77,95 @@ rate_max <- max(df$imdb_score) #9.5
 rate_min <- min(df$imdb_score) #1.6
 rate_median <- median(df$imdb_score) #6.6
 
-#plots
-ggplot(df)+geom_smooth(aes(imdb_score, gross))+xlab("IMDB rating scores")+ylab("Gross")+xlim(0,10)
-ggplot(df)+geom_smooth(aes(imdb_score, num_voted_users))+xlab("IMDB rating scores")+ylab("Number of voted users")+xlim(0,10)
-ggplot(df)+geom_smooth(aes(imdb_score,movie_facebook_likes))+xlim(0,10)
-ggplot(df)+geom_smooth(aes(budget,gross))
+# stats of gross
+invisible(as.numeric(df$gross))
+invisible(as.integer(df$gross))
+gross_mean <- mean(df$gross,na.rm = TRUE) #48468407.527
+gross_max <- max(df$gross,na.rm = TRUE) #760505847
+gross_min <- min(df$gross,na.rm = TRUE) #162
+gross_median <- median(df$gross,na.rm = TRUE) #25517500
 
+# stats of budget
+invisible(as.numeric(df$budget))
+invisible(as.integer(df$budget))
+budget_mean <- mean(df$budget,na.rm = TRUE) #39752620.436
+budget_max <- max(df$budget,na.rm = TRUE) #12215500000
+budget_min <- min(df$budget,na.rm = TRUE) #218
+budget_median <- median(df$budget,na.rm = TRUE) #2e+07
+
+# stats of duration time in minutes
+invisible(as.numeric(df$duration))
+invisible(as.integer(df$duration))
+duration_mean <- mean(df$duration,na.rm = TRUE) #107.201
+duration_max <- max(df$duration,na.rm = TRUE) #511
+duration_min <- min(df$duration,na.rm = TRUE) #7
+duration_median <- median(df$duration,na.rm = TRUE) #103
+
+# stats of number of critics review
+invisible(as.numeric(df$num_critic_for_reviews))
+invisible(as.integer(df$num_critic_for_reviews))
+critic_mean <- mean(df$num_critic_for_reviews,na.rm = TRUE) #140.194
+critic_max <- max(df$num_critic_for_reviews,na.rm = TRUE) #813
+critic_min <- min(df$num_critic_for_reviews,na.rm = TRUE) #1
+critic_median <- median(df$num_critic_for_reviews,na.rm = TRUE) #110
+
+# define a table to summarize stats
+fb <- c(fblike_mean,fblike_max,fblike_min,fblike_median)
+cfb <- c(cfblike_mean,cfblike_max,cfblike_min,cfblike_median)
+vote <- c(numvote_mean,numvote_max,numvote_min,numvote_median)
+rate <- c(rate_mean,rate_max,rate_min,rate_median)
+gross <- c(gross_mean,gross_max,gross_min,gross_median)
+budget <- c(budget_mean,budget_max,budget_min,budget_median)
+duration <- c(duration_mean,duration_max,duration_min,duration_median)
+critic <- c(critic_mean,critic_max,critic_min,critic_median)
+
+stat_df <- data.frame(fb,cfb,vote,rate,gross,budget,duration,critic)
+names(stat_df) <- c("Number of Facebook likes","Number of Cast Total Facebook likes","Number of voted users","IMDB rating scores" ,"Gross","Budget","Duration Time in minutes","Number of Critic Reviews")
+row.names(stat_df) <- c("Mean","Maxium","Minium","Median")
+kable(t(stat_df))
+```
+
+## Graph presentations
+
+The plot below shows the relationship between movie gross and movie IMDB rating scores. Generally speaking, with higher IMDB rating scores, movies tend to have higher gross. Around IMDB score 7.5, the range of gross is relatively small, which indicates that movies with IMDB score 7.5 tend to have similar profit. 
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+#plots
+ggplot(df)+geom_smooth(aes(imdb_score, gross))+xlab("IMDB Rating Scores")+ylab("Gross")+xlim(0,10)
+```
+
+The plot below shows the relationship between IMDB rating scores and number of voted users. It is pretty obvious that movies with higer IMDB scores tend to have more voted users, which indicates that most users have similar tastes in movie ratings and higher-rated movies have more audiences willing to vote. 
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(df)+geom_smooth(aes(imdb_score, num_voted_users))+xlab("IMDB Rating Scores")+ylab("Number of Voted Users")+xlim(0,10)
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(df)+geom_smooth(aes(imdb_score,movie_facebook_likes))+xlim(0,10)+xlab("IMDB Rating Scores")+ylab("Number of Movie Facebook Likes")
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(na.omit(df))+geom_smooth(aes(gross,budget))
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(df)+geom_smooth(aes(imdb_score,duration))
 ```
 
 # Medthod
 
+Multi-level linear regression model. 
+
 # Analysis
 
+```{r}
+
+
+```
+
 # Conclusion and Discussion
+
+## Limitations
+
 
 # Appendix
