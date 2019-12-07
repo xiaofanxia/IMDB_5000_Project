@@ -1,7 +1,7 @@
 ---
 title: "IMDB Movie Project Report"
 author: "Xiaofan Xia"
-date: "12/5/2019"
+date: "12/7/2019"
 output:
   pdf_document: default
 ---
@@ -179,8 +179,10 @@ The
 # 4. Modeling and Analysis
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-model <- lmer(imdb_score ~ movie_facebook_likes + (movie_facebook_likes | primarygenre), data=df)
-fit <- summary(model)
+
+model <- lmer(imdb_score ~ movie_facebook_likes + (movie_facebook_likes| primarygenre), data=df)
+summary(model)
+coef(model)$primarygenre
 
 ```
 
