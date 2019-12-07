@@ -12,6 +12,8 @@ library(tidyverse)
 library(knitr)
 library(ggplot2)
 library(kableExtra)
+library(lme4)
+
 df <- read.csv("movie_metadata.csv")
 df$genres <- as.character(df$genres)
 df <-
@@ -34,23 +36,32 @@ The initial idea of choosing the IMDB movie topic comes from my personal interes
 ## 1.3 Dataset: IMDB 5000 Movie Dataset from Kaggle.
 
 The IMDB 5000 Movie Dataset contains 28 variables such as movie names, director names, IMDB scores, and movie Facebook likes, etc. This is an open database from Kaggle.
-Sources: https://www.kaggle.com/carolzhangdc/imdb-5000-movie-dataset 
+
+
+Source: https://www.kaggle.com/carolzhangdc/imdb-5000-movie-dataset 
 
 ## 1.4 Research Questions
 
-1. Is there any relationship between the popularity of casts (Facebook likes) and the income of the movie (gross)?
-2. Is there any relationship between the popularity of casts (Facebook likes) and the reputation of the movie(IMDB rating scores)?
-3. Is there any difference in the ratio of the budget to the gross regarding to different movie genres?
-4. What are the patterns of budget and cast in movies with high reputation?
-5. What are the patterns of budget and cast in movies with high income?
-6. What’s the relationship between the number of face in the poster and the movie’s reputation?
-7. Is there any difference in above questions regarding to different language or country of the movies?
-8. How can we predict the IMDB rating score using other information of the movie? 
+a. Is there any relationship between the popularity of casts (Facebook likes) and the income of the movie (gross)?
+
+b. Is there any relationship between the popularity of casts (Facebook likes) and the reputation of the movie(IMDB rating scores)?
+
+c. Is there any difference in the ratio of the budget to the gross regarding to different movie genres?
+
+d. What are the patterns of budget and cast in movies with high reputation?
+
+e. What are the patterns of budget and cast in movies with high income?
+
+f. What’s the relationship between the number of face in the poster and the movie’s reputation?
+
+g. Is there any difference in above questions regarding to different language or country of the movies?
+
+h. How can we predict the IMDB rating score using other information of the movie? 
 
 
 # 2. Exploratory Data Analysis
 
-## 2.1 Basic statistics of major variables
+## 2.1 Basic Statistics of Major Variables
 After cleaning the dataset, I firstly explore the basic statistics of major variables I am interested in. In this part, I am assuming the gross and budget are in the same currency with same unit. There are 66 different countries and 48 different languages in this dataset, which shows diverse background of movies. Here's a table of statistics (values of mean, maximum, minimum and median) for varibales including number of Facebook likes, IMDB rating scores and gross.
 
 ```{r message=FALSE, warning=FALSE, echo=FALSE}
@@ -126,41 +137,50 @@ row.names(stat_df) <- c("Mean","Maxium","Minium","Median")
 kable(t(stat_df))
 ```
 
-## 2.2 Graph presentations
+## 2.2 Graph Presentation
 
-The plot below shows the relationship between movie gross and movie IMDB rating scores. Generally speaking, with higher IMDB rating scores, movies tend to have higher gross. Around IMDB score 7.5, the range of gross is relatively small, which indicates that movies with IMDB score 7.5 tend to have similar profit. 
+The first graph shows the relationship between movie gross and movie IMDB rating scores. Generally speaking, with higher IMDB rating scores, movies tend to have higher gross. Around IMDB score 7.5, the range of gross is relatively small, which indicates that movies with IMDB score 7.5 tend to have similar profit. We can see that people would spend money on movies with good reputation and movies with good reputation could gain more and more profit. Keeping a great reputation is kind of significant for a movie to survive in the movie market today. Indeed, more and more filming production teams put great effort in advertising their work to the public than before. 
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 #plots
-ggplot(df)+geom_smooth(aes(imdb_score, gross))+xlab("IMDB Rating Scores")+ylab("Gross")+xlim(0,10)
+ggplot(df)+geom_smooth(aes(imdb_score, gross))+xlab("IMDB Rating Scores")+ylab("Gross")+xlim(0,10)+ggtitle("Relationship between Gross and IMDB Scores")
 ```
 
-The plot below shows the relationship between IMDB rating scores and number of voted users. It is pretty obvious that movies with higer IMDB scores tend to have more voted users, which indicates that most users have similar tastes in movie ratings and higher-rated movies have more audiences willing to vote. 
+The second graph shows the relationship between IMDB rating scores and number of voted users. It is pretty obvious that movies with higer IMDB scores tend to have more voted users, which indicates that most users have similar tastes in movies and higher-rated movies have more audiences willing to vote for them. 
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(df)+geom_smooth(aes(imdb_score, num_voted_users))+xlab("IMDB Rating Scores")+ylab("Number of Voted Users")+xlim(0,10)
+ggplot(df)+geom_smooth(aes(imdb_score, num_voted_users))+xlab("IMDB Rating Scores")+ylab("Number of Voted Users")+xlim(0,10)+ggtitle("Relationship between Number of Voted Users and IMDB Scores")
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(df)+geom_smooth(aes(imdb_score,movie_facebook_likes))+xlim(0,10)+xlab("IMDB Rating Scores")+ylab("Number of Movie Facebook Likes")
-```
+The third graph gives a visual interpretation of the relationship between number of movie Facebook likes and IMDB rating scores, which also could indicate the relationship between movies' popularity and their reputation. Although some movies with lower IMDB scores recieve relatively more Facebook likes, we can see that movies with higher IMDB scores generally have more Facebook likes. 
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(na.omit(df))+geom_smooth(aes(gross,budget))
+ggplot(df)+geom_smooth(aes(imdb_score,movie_facebook_likes))+xlim(0,10)+xlab("IMDB Rating Scores")+ylab("Number of Movie Facebook Likes")+ggtitle("Relationship between Number of Movie Facebook Likes and IMDB Scores")
 ```
 
+From the fourth graph, we can see that generally movies with higher gross tend to have higher budget in the begining phase of filming production. Furthermore,movies with higher gross tend to have wider range of  budget than movies with lower gross. Generally speaking, better script of movies could earn more budget at the begining phase of filming production and better script have larger chance to gain more gross. These days, movies with low budget could be famous and win many big rewards with novel ideas and cutting-edge shooting techniques, which should explain the wide range of budget in higher gross movies. 
+
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(df)+geom_smooth(aes(imdb_score,duration))
+ggplot(na.omit(df))+geom_smooth(aes(gross,budget))+xlab("Gross")+ylab("Budget")+ggtitle("Relationship between Budget and Gross")
+```
+
+The fifth graph here interpret the relationship between the movie duration time and the IMDB rating scores visually. We can see that movies with most high scores and most low scores tend to have wider range of duration time, but movies with scores from around 5.0 to 8.0 have relatively stable pattern in duration time. Behind the graph, duration time is not a main factor affecting IMDB rating scores since the duration time of a movie is generally between 90 minutes to 120 minutes. 
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(df)+geom_smooth(aes(imdb_score,duration))+xlab("IMDB Rating Scores")+ylab("Duration Time of Movies (in Minutes)")+ggtitle("Relationship between Duration Time of Movies and IMDB Scores")+xlim(0,10)
 ```
 
 # 3. Medthod
 
-Multi-level linear regression model. 
+In this project, I focus on the relationship between the popularity of movies and the reputation of movies. Therefore, I use the multi-level linear regression model to analyze that if there is any relationship between the numbers of movie Facebook likes and the IMDB rating scores. 
 
-# 4. Analysis
+The 
 
-```{r}
+# 4. Modeling and Analysis
 
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+model <- lmer(imdb_score ~ movie_facebook_likes + (movie_facebook_likes | primarygenre), data=df)
+fit <- summary(model)
 
 ```
 
